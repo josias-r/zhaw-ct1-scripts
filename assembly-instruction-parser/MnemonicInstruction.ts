@@ -91,7 +91,7 @@ class MnemonicInstruction {
         return filledBinary.replaceAll(/0b[01]+/g, (match) => {
           return (
             COLOR_START +
-            "#0x" +
+            "0x" +
             parseInt(`0${match.substring(2)}`, 2)
               .toString(16)
               .toUpperCase() +

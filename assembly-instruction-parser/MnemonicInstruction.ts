@@ -1,14 +1,40 @@
-function splitAtFirst(str: string, delimiter: string) {
-  const index = str.indexOf(delimiter);
-  if (index === -1) return [str]; // delimiter not found
-  return [str.substring(0, index), str.substring(index + delimiter.length)];
+import { colorize } from "./colorize.ts";
+import { splitAtFirst } from "./utils.ts";
+
+function escapeRegex(string: string) {
+  return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, "\\$&");
 }
+
+type MnemonicInstructionPlaceholderDict = Record<
+  string,
+  {
+    type: "register" | "immediate";
+    length: number;
+  }
+>;
+
+const REGISTER_TEMPLATE_REGEX = /(R[t]+|R[n]+|R[m]+|R[d]+)/g;
+const IMMEDIATE_TEMPLATE_REGEX = /#0b[01]*[i]+[01]*/g;
+const REGISTER_REGEX_STRING = "R\\d+";
+const REGISTER_REGEX = new RegExp(REGISTER_REGEX_STRING, "g");
+const IMMEDIATE_REGEX_STRING = "#(0x[0-9a-fA-F]+|0b[01]+|\\d+)";
+const IMMEDIATE_REGEX = new RegExp(IMMEDIATE_REGEX_STRING, "g");
 
 type MnemonicInstructionDetails = {
   mnemonic: string;
   instruction: string[];
   comment: string[];
 };
+
+function parseIntValue(value: string) {
+  if (value.startsWith("0x")) {
+    return parseInt(value.substring(2), 16);
+  }
+  if (value.startsWith("0b")) {
+    return parseInt(value.substring(2), 2);
+  }
+  return parseInt(value, 10);
+}
 
 class MnemonicInstruction {
   mnemonic: string;
@@ -35,6 +61,106 @@ class MnemonicInstruction {
     this.mnemonic = mnemonic.trim();
     this.instruction = instruction;
     this.comment = comment;
+  }
+
+  public compareToMnemonic(
+    mnemonicInstruction: string
+  ): false | [string, string][] {
+    const [mnemonic, cleanInstruction] = splitAtFirst(mnemonicInstruction, " ");
+    if (mnemonic !== this.mnemonic) {
+      return false;
+    }
+
+    for (const instruction of this.instruction) {
+      const match = this.matchInstruction(instruction, cleanInstruction);
+      if (match) {
+        return match;
+      }
+    }
+    return false;
+  }
+
+  private matchInstruction(instruction: string, cleanInstruction: string) {
+    // instruction stored as: LDR Rttt, [Rnnn, #0b0iiiii00]
+    // we replace all R[tndm] the registerRegex
+    const matchedRegistersTemplate: string[] = [];
+    const matchedImmediatesTemplate: string[] = [];
+    const replacedTemplates = escapeRegex(instruction)
+      .replaceAll(REGISTER_TEMPLATE_REGEX, (match) => {
+        matchedRegistersTemplate.push(match);
+        return REGISTER_REGEX_STRING;
+      })
+      .replaceAll(IMMEDIATE_TEMPLATE_REGEX, (match) => {
+        matchedImmediatesTemplate.push(match);
+        return IMMEDIATE_REGEX_STRING;
+      });
+
+    if (new RegExp(replacedTemplates).test(cleanInstruction)) {
+      const matchedRegisters = Array.from(
+        cleanInstruction.matchAll(REGISTER_REGEX)
+      ).map((match) => match[0]);
+      const matchedImmediates = Array.from(
+        cleanInstruction.matchAll(IMMEDIATE_REGEX)
+      ).map((match) => match[0]);
+
+      const registerMatchDict: [string, string][] = matchedRegisters.map(
+        (register, idx) => {
+          const template = matchedRegistersTemplate[idx].substring(1);
+          const binary = parseInt(register.substring(1)).toString(2);
+          if (template.length < binary.length) {
+            throw new Error("Invalid register length");
+          }
+          const zeroes = "0".repeat(template.length - binary.length);
+          const binaryValue = zeroes + binary;
+
+          return [template[0], binaryValue];
+        }
+      );
+
+      const immediateMatchDict: [string, string][] = matchedImmediates.map(
+        (immediate, idx) => {
+          const template = matchedImmediatesTemplate[idx];
+          const intValue = parseIntValue(immediate.substring(1));
+          const binary = intValue.toString(2);
+          // i.e iiii00
+          // or  iiii
+          const templatePlaceholder = "i" + splitAtFirst(template, "i")[1];
+          if (templatePlaceholder.length < binary.length) {
+            throw new Error("Invalid immediate length");
+          }
+          const [IIIIII, addedZeroes] = splitAtFirst(
+            templatePlaceholder + "0",
+            "0"
+          );
+          // i.e. 01 => 0001 if template is iiii
+          // or.  0111 => 000111 if template is iiii00
+          const binaryPadded =
+            "0".repeat(templatePlaceholder.length - binary.length) + binary;
+
+          if (addedZeroes.length) {
+            // ensure the parsed binary also ends with the amount of zeroes
+            const binarySuffix = binaryPadded.substring(IIIIII.length);
+
+            if (binarySuffix !== addedZeroes) {
+              throw new Error(
+                "Binary does not end with " +
+                  addedZeroes +
+                  " got " +
+                  binary +
+                  " (this might be allowed if cut off)"
+              );
+            }
+          }
+
+          const binaryIIs = binaryPadded.substring(0, IIIIII.length);
+          return ["i", binaryIIs];
+        }
+      );
+
+      return [...registerMatchDict, ...immediateMatchDict];
+    }
+
+    return false;
   }
 
   private parseFullInstruction(
@@ -81,37 +207,27 @@ class MnemonicInstruction {
     const searchTerm = letter.repeat(binaryValue.length);
 
     const replaceInString = (str: string) => {
-      const COLOR_END = "\x1b[0m";
-
       if (letter === "i") {
-        const COLOR_START = "\x1b[33m";
-
         const binaryRegex = new RegExp(`(0b[01]*)${searchTerm}([01]*)`, "g");
         const filledBinary = str.replaceAll(binaryRegex, `$1${binaryValue}$2`);
         return filledBinary.replaceAll(/0b[01]+/g, (match) => {
-          return (
-            COLOR_START +
+          return colorize(
+            "orange",
             "0x" +
-            parseInt(`0${match.substring(2)}`, 2)
-              .toString(16)
-              .toUpperCase() +
-            COLOR_END
+              parseInt(`0${match.substring(2)}`, 2)
+                .toString(16)
+                .toUpperCase()
           );
         });
       }
       if (letter === "r") {
-        const COLOR_START = "\x1b[31m";
-
-        return str.replaceAll(
-          searchTerm,
-          COLOR_START + binaryValue + COLOR_END
-        );
+        return str.replaceAll(searchTerm, colorize("red", binaryValue));
       }
 
-      const COLOR_START = "\x1b[36m";
       return str.replaceAll(
         searchTerm,
-        COLOR_START + parseInt(`0${binaryValue}`, 2).toString() + COLOR_END
+
+        colorize("cyan", parseInt(`0${binaryValue}`, 2).toString())
       );
     };
 

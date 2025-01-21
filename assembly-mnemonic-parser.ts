@@ -1,36 +1,34 @@
-import { AssemblyInstructionDefinition } from "./assembly-instruction-parser/AssemblyInstructionDefinition.ts";
 import { ASSEMLBY_INSTRUCTIONS } from "./assembly-instruction-parser/loadAssemblyInstructions.ts";
 
-const searchThumbCode = prompt("Please enter a searchThumbCode:");
+// const mnemonicInstruction = prompt("Please enter a mnemonicInstruction:");
+// const mnemonicInstruction = "LDR R7, [R2, #0x4]";
+const mnemonicInstruction = "POP {PC,R1,R3}";
+// const mnemonicInstruction = "STR R7, [R2, R3]";
 
-// const searchThumbCode = "0100 0111 0010 1010";
-if (!searchThumbCode) {
-  throw new Error("Invalid searchThumbCode");
+if (!mnemonicInstruction) {
+  throw new Error("Invalid mnemonicInstruction");
 }
 
-const bestMatch =
-  ASSEMLBY_INSTRUCTIONS.reduce<AssemblyInstructionDefinition | null>(
-    (currentBestMatch, assemblyInstruction) => {
-      const matchLength =
-        assemblyInstruction.compareToThumbCode(searchThumbCode);
-      const currentBestMatchLength =
-        currentBestMatch?.compareToThumbCode(searchThumbCode) || 0;
-
-      if (matchLength > 0 && matchLength === currentBestMatchLength) {
-        console.warn("Two equally good matches found!");
+function findBestMatch() {
+  for (const assemblyInstruction of ASSEMLBY_INSTRUCTIONS) {
+    try {
+      const didMatch =
+        assemblyInstruction.compareToMnemonic(mnemonicInstruction);
+      if (didMatch) {
+        return { thumbCode: didMatch, assemblyInstruction };
       }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  return null;
+}
 
-      if (matchLength > 0 && matchLength > currentBestMatchLength) {
-        return assemblyInstruction;
-      }
-
-      return currentBestMatch;
-    },
-    null
-  );
+const bestMatch = findBestMatch();
 
 if (bestMatch) {
-  console.log(bestMatch.getMnemonicWithValues(searchThumbCode).toString());
+  console.log(bestMatch.thumbCode);
+  console.log(bestMatch.assemblyInstruction);
 } else {
   console.warn("No match found!");
 }

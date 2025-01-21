@@ -1,6 +1,5 @@
 class Thumbcode {
   prefix: string;
-
   placeholders: string;
 
   get thumbCode() {
@@ -16,14 +15,20 @@ class Thumbcode {
     }
     // split at first NOT 0 or 1
     const lastZeroOrOneIndex = thumbCode.search(/[^01]/);
-    const prefix = thumbCode.substring(0, lastZeroOrOneIndex);
-    const placeholdersString = thumbCode.substring(lastZeroOrOneIndex);
+    const actualSplitIndex =
+      lastZeroOrOneIndex === -1 ? 16 : lastZeroOrOneIndex;
+
+    const prefix = thumbCode.substring(0, actualSplitIndex);
+    const placeholdersString = thumbCode.substring(actualSplitIndex);
 
     this.placeholders = placeholdersString;
     this.prefix = prefix;
   }
 
   public compareToThumbCode(binaryThumbCode: string) {
+    if (binaryThumbCode.length !== 16) {
+      throw new Error("Binary thumb code must be 16 characters long");
+    }
     if (binaryThumbCode.startsWith(this.prefix)) {
       return this.prefix.length;
     }

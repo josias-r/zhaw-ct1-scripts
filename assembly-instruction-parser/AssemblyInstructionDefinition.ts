@@ -16,7 +16,8 @@ class AssemblyInstructionDefinition {
   }
 
   public compareToThumbCode(binaryThumbCode: string) {
-    return this.thumbCode.compareToThumbCode(binaryThumbCode);
+    const cleanBinaryThumbCode = binaryThumbCode.replace(/\s/g, "");
+    return this.thumbCode.compareToThumbCode(cleanBinaryThumbCode);
   }
 
   public getMnemonicWithValues(binaryThumbCode: string) {
@@ -52,15 +53,13 @@ class AssemblyInstructionDefinition {
 
     Object.entries(placeholdersDictionary).forEach(
       ([letter, { binaryValue }]) => {
-        const searchTerm = letter.repeat(binaryValue.length);
-        mnemonicInstruction = mnemonicInstruction.replaceAll(
-          searchTerm,
-          parseInt(`0${binaryValue}`, 2).toString()
-        );
-        mnemonicComment = mnemonicComment.replaceAll(
-          searchTerm,
-          parseInt(`0${binaryValue}`, 2).toString()
-        );
+        [mnemonicInstruction, mnemonicComment] =
+          this.mnemonic.insertPlaceholderValues(
+            mnemonicInstruction,
+            mnemonicComment,
+            letter,
+            binaryValue
+          );
       }
     );
 

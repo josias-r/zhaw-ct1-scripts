@@ -1,7 +1,7 @@
 import { AssemblyInstructionDefinition } from "./AssemblyInstructionDefinition.ts";
 
 const assemblyInstructionsFile = await Deno.readFile(
-  "./assembly-instructions.txt"
+  "./assembly-instruction-parser/assembly-instructions.txt"
 );
 
 const ASSEMLBY_INSTRUCTIONS: AssemblyInstructionDefinition[] = [];

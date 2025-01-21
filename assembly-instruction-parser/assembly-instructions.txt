@@ -39,7 +39,7 @@
 0100 0101 nmmm mnnn CMP Rnnnn, Rmmmm ; flags : Rnnnn - Rmmmm
 0100 0110 dmmm mddd MOV Rdddd, Rmmmm ; Rdddd = Rmmmm
 0100 0111 1mmm m... BLX Rmmmm ; LR = IPC+2,PC=Rmmmm (mmmm==0b1111: unpredictable)
-0100 1ttt iiii iiii LDR Rttt, [PC, #off] ; Rttt = [((IPC+4)&~0b011)+0b0iiiiiiii00] --> +1020 max \\nLDR Rttt, label ; --> the assembler calculates the above from the label \\nLDR Rttt, =lab ; --> pseudo instruction: the assembler stores the lab/lit \\nLDR Rttt, =lit ; in litpool, access PC relative with LDR Rttt,litpool
+0100 1ttt iiii iiii LDR Rttt, [PC, 0b0iiiiiiii00] ; Rttt = [((IPC+4)&~0b011)+0b0iiiiiiii00] --> +1020 max \\nLDR Rttt, label ; --> the assembler calculates the above from the label \\nLDR Rttt, =lab ; --> pseudo instruction: the assembler stores the lab/lit \\nLDR Rttt, =lit ; in litpool, access PC relative with LDR Rttt,litpool
 
 // 0101 – 0x5xxx Instructions
 0101 000m mmnn nttt STR Rttt, [Rnnn, Rmmm] ; [Rnnn + Rmmm] = Rttt
@@ -52,30 +52,30 @@
 0101 111m mmnn nttt LDRSH Rttt, [Rnnn, Rmmm] ; Rttt<ss21> = [Rnnn + Rmmm]<21> --> low half
 
 // 0110 – 0x6xxx Instructions
-0110 0iii iinn nttt STR Rttt, [Rnnn, #off] ; [Rnnn + 0b0iiiii00] = Rttt --> +124 max
-0110 1iii iinn nttt LDR Rttt, [Rnnn, #off] ; Rttt = [Rnnn + 0b0iiiii00] --> +124 max
+0110 0iii iinn nttt STR Rttt, [Rnnn, 0b0iiiii00] ; [Rnnn + 0b0iiiii00] = Rttt --> +124 max
+0110 1iii iinn nttt LDR Rttt, [Rnnn, 0b0iiiii00] ; Rttt = [Rnnn + 0b0iiiii00] --> +124 max
 
 // 0111 – 0x7xxx Instructions
-0111 0iii iinn nttt STRB Rttt, [Rnnn, #off] ; [Rnnn + 0b0iiiii] = Rttt --> +31 max, low byte
-0111 1iii iinn nttt LDRB Rttt, [Rnnn, #off] ; Rttt<0001> = [Rnnn + 0b0iiiii]<1> --> +31 max, low byte
+0111 0iii iinn nttt STRB Rttt, [Rnnn, 0b0iiiii] ; [Rnnn + 0b0iiiii] = Rttt --> +31 max, low byte
+0111 1iii iinn nttt LDRB Rttt, [Rnnn, 0b0iiiii] ; Rttt<0001> = [Rnnn + 0b0iiiii]<1> --> +31 max, low byte
 
 // 1000 – 0x8xxx Instructions
-1000 0iii iinn nttt STRH Rttt, [Rnnn, #off] ; [Rnnn + 0b0iiiii0] = Rttt --> +62 max, low half
-1000 1iii iinn nttt LDRH Rttt, [Rnnn, #off] ; Rttt<0021> = [Rnnn + 0b0iiiii0]<21> --> +62 max, low half
+1000 0iii iinn nttt STRH Rttt, [Rnnn, 0b0iiiii0] ; [Rnnn + 0b0iiiii0] = Rttt --> +62 max, low half
+1000 1iii iinn nttt LDRH Rttt, [Rnnn, 0b0iiiii0] ; Rttt<0021> = [Rnnn + 0b0iiiii0]<21> --> +62 max, low half
 
 // 1001 – 0x9xxx Instructions
-1001 0ttt iiii iiii STR Rttt, [SP, #off] ; [SP + 0b0iiiiiiii00] = Rttt --> +1020 max
-1001 1ttt iiii iiii LDR Rttt, [SP, #off] ; Rttt = [SP + 0b0iiiiiiii00] --> +1020 max
+1001 0ttt iiii iiii STR Rttt, [SP, 0b0iiiiiiii00] ; [SP + 0b0iiiiiiii00] = Rttt --> +1020 max
+1001 1ttt iiii iiii LDR Rttt, [SP, 0b0iiiiiiii00] ; Rttt = [SP + 0b0iiiiiiii00] --> +1020 max
 
 
 // PAGE 2
 // 1010 – 0xAxxx Instructions
 1010 0ddd iiii iiii ADR Rddd, label ; Rddd = ((IPC+4)&~0b011)+0b0iiiiiiii00 --> +1020 max
-1010 1ddd iiii iiii ADD Rddd, SP, #off ; Rddd = SP + 0b0iiiiiiii00 --> +1020 max
+1010 1ddd iiii iiii ADD Rddd, SP, 0b0iiiiiiii00 ; Rddd = SP + 0b0iiiiiiii00 --> +1020 max
  
 // 1011 – 0xBxxx Instructions
-1011 0000 0iii iiii ADD SP, SP, #off ; SP = SP + 0b0iiiiiii00 --> +508 max
-1011 0000 1iii iiii SUB SP, SP, #off ; SP = SP - 0b0iiiiiii00 --> +508 max
+1011 0000 0iii iiii ADD SP, SP, 0b0iiiiiii00 ; SP = SP + 0b0iiiiiii00 --> +508 max
+1011 0000 1iii iiii SUB SP, SP, 0b0iiiiiii00 ; SP = SP - 0b0iiiiiii00 --> +508 max
 1011 0010 00mm mddd SXTH Rddd, Rmmm ; Rddd<ss21> = Rmmm<4321> --> low half
 1011 0010 01mm mddd SXTB Rddd, Rmmm ; Rddd<sss1> = Rmmm<4321> --> low byte
 1011 0010 10mm mddd UXTH Rddd, Rmmm ; Rddd<0021> = Rmmm<4321> --> low half

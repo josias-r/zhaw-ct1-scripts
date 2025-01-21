@@ -115,12 +115,7 @@ class AssemblyInstructionDefinition {
       return [item];
     });
 
-    return (
-      fullBinaryString.join("") +
-      " - " +
-      this.thumbCode.prefix +
-      this.thumbCode.placeholders
-    );
+    return fullBinaryString.join("");
   }
 
   public getMnemonicWithValues(binaryThumbCode: string) {

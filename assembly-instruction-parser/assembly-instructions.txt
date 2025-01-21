@@ -81,14 +81,14 @@
 1011 0010 10mm mddd UXTH Rddd, Rmmm ; Rddd<0021> = Rmmm<4321> --> low half
 1011 0010 11mm mddd UXTB Rddd, Rmmm ; Rddd<0001> = Rmmm<4321> --> low byte
 1011 0100 rrrr rrrr PUSH {reg0-7} ; rrrrrrrr = Lo reg-mask --> pushes regs to SP (decrements SP)
-1011 0101 rrrr rrrr PUSH {LR,reg0-7] ; rrrrrrrr = Lo reg-mask --> pushes regs to SP (decrements SP)
+1011 0101 rrrr rrrr PUSH {LR, reg0-7} ; rrrrrrrr = Lo reg-mask --> pushes regs to SP (decrements SP)
 1011 0110 0101 0... SETEND LE ; sets little-endian mode in CPSR
 1011 0110 0101 1... SETEND BE ; sets big-endian mode in CPSR
 1011 1010 00mm mddd REV Rddd, Rmmm ; Rddd<4321> = Rmmm<1234> --> reverse all
 1011 1010 01mm mddd REV16 Rddd, Rmmm ; Rddd<4321> = Rmmm<3412> --> reverse low half, rev. upper half
 1011 1010 11mm mddd REVSH Rddd, Rmmm ; Rddd<4321> = Rmmm<ss12> --> reverse low half, sign extended
 1011 1100 rrrr rrrr POP {reg0-7} ; rrrrrrrr = Lo reg-mask --> pops regs from SP (increments SP)
-1011 1101 rrrr rrrr POP {PC,reg0-7] ; rrrrrrrr = Lo reg-mask --> pops regs from SP (increments SP)
+1011 1101 rrrr rrrr POP {PC, reg0-7} ; rrrrrrrr = Lo reg-mask --> pops regs from SP (increments SP)
 1011 1110 iiii iiii BKPT #0biiiiiiii ; breakpoint, arg ignored by HW
 1011 1111 0000 0000 NOP nothing ; do nothing
 1011 1111 0001 0000 YIELD nothing ; do nothing, NOP-Hint: signal to HW to suspend/resume threads

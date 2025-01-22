@@ -1,8 +1,8 @@
 # Moodle Exercise Solutions
 
-- **[Computer Engineering](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1723162&cmid=1408589)**: Hardware, Source-to-Executable
-- **[Cortex-M Architecture](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1723184&cmid=1408593)**: CPU-Components, Word Alignment, Little Endian, Program-Execution-Sequence, Memory Map, Areas, Registers
-- **[Data Transfer](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1641283&cmid=1408599)**: MOV, LDR, STR, Memory Alignment, Literals, Thumb Codes, Relative Offsets
+- **[Computer Engineering](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1784686&cmid=1408589)**: Hardware, Source-to-Executable
+- **[Cortex-M Architecture](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1784708&cmid=1408593)**: CPU-Components, Word Alignment, Little Endian, Program-Execution-Sequence, Memory Map, Areas, Registers
+- **[Data Transfer](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1784752&cmid=1408599)**: MOV, LDR, STR, Memory Alignment, Literals, Thumb Codes, Relative Offsets
 - **[Arithmetic Operations](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1641414&cmid=1408609)**: Overflow, Underflow, Carry/Borrow, Sign, Zero, Subtraction, ALU, Flags, ADD, SUB, ADCS
 - **[Casting](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1641557&cmid=1408610)**: Signed, Unsigned
 - **[Logic and Shift/Rotate](https://moodle.zhaw.ch/mod/quiz/review.php?attempt=1644631&cmid=1408616)**: MVNS, EORS, ANDS, BICS, LSLS, LSRS, ASRS, RORS

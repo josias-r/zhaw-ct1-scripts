@@ -39,7 +39,7 @@
 0100 0101 nmmm mnnn CMP Rnnnn, Rmmmm ; flags : Rnnnn - Rmmmm
 0100 0110 dmmm mddd MOV Rdddd, Rmmmm ; Rdddd = Rmmmm
 0100 0111 1mmm m... BLX Rmmmm ; LR = IPC+2,PC=Rmmmm (mmmm==0b1111: unpredictable)
-0100 1ttt iiii iiii LDR Rttt, [PC, #0b0iiiiiiii00] ; Rttt = [((IPC+4)&~0b011)+0b0iiiiiiii00] --> +1020 max \\nLDR Rttt, label ; --> the assembler calculates the above from the label \\nLDR Rttt, =lab ; --> pseudo instruction: the assembler stores the lab/lit \\nLDR Rttt, =lit ; in litpool, access PC relative with LDR Rttt,litpool
+0100 1ttt iiii iiii LDR Rttt, [PC, #0b0iiiiiiii00] ; Rttt = [((IPC+4)&~0b011)+0b0iiiiiiii00] --> +1020 max \\nLDR Rttt, label ; Rttt = Value(label) \\nLDR Rttt, =lab ; Rttt = Addr(lab) \\nLDR Rttt, =lit ; in litpool, access PC relative with LDR Rttt,litpool
 
 // 0101 – 0x5xxx Instructions
 0101 000m mmnn nttt STR Rttt, [Rnnn, Rmmm] ; [Rnnn + Rmmm] = Rttt
